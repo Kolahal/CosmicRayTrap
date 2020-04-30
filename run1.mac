@@ -1,0 +1,7 @@
+# Initialize kernel
+/run/initialize
+/CRY/input returnMuons 1
+/CRY/input returnProtons 1
+#/tracking/verbose 1
+/tracking/storeTrajectory 1
+/run/beamOn 1
