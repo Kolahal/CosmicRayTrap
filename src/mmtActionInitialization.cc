@@ -22,7 +22,7 @@ void mmtActionInitialization::Build() const
 	SetUserAction(new mmtPrimaryGeneratorAction(infile));
 	//SetUserAction(new mmtPrimaryGeneratorAction);
 	SetUserAction(new mmtRunAction);
-	auto eventAction = new mmtEventAction();
+	auto eventAction = new mmtEventAction(fDetConstruction);
 	SetUserAction(eventAction);
 	SetUserAction(new mmtSteppingAction(fDetConstruction,eventAction));
 }

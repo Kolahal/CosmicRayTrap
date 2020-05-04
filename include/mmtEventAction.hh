@@ -4,10 +4,13 @@
 #include "G4UserEventAction.hh"
 #include "mmtRunAction.hh"
 #include "globals.hh"
+
+class mmtDetectorConstruction;
+
 class mmtEventAction : public G4UserEventAction
 {
 	public:
-	mmtEventAction();
+	mmtEventAction(const mmtDetectorConstruction* detectorconstruction);
        ~mmtEventAction();
 	
 	virtual void BeginOfEventAction(const G4Event* event);
@@ -38,6 +41,8 @@ class mmtEventAction : public G4UserEventAction
 	G4double fTXout;
 	G4double fTYout;
 	G4double fTZout;
+
+	const mmtDetectorConstruction* fDet;
 };
 
 #endif

@@ -1,0 +1,8 @@
+returnNeutrons 0
+returnMuons 1
+returnProtons 0
+returnGammas 0
+date 5-1-2019
+latitude 41.88
+altitude 0
+subboxLength 100

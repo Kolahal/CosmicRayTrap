@@ -2,6 +2,7 @@
 #include "mmtRunAction.hh"
 #include "mmtSteppingAction.hh"
 #include "mmtAnalysis.hh"
+#include "mmtDetectorConstruction.hh"
 
 #include "G4RunManager.hh"
 #include "G4Event.hh"
@@ -10,12 +11,13 @@
 #include "G4TrajectoryContainer.hh"
 #include "G4Trajectory.hh"
 #include "G4ParticleTable.hh"
+#include "G4ExtrudedSolid.hh"
 #include "Randomize.hh"
 #include <iomanip>
 #include <iostream>
 using namespace std;
 
-mmtEventAction::mmtEventAction(): G4UserEventAction(), fEvent(0), fInParticleID(0), fOutParticleID(0), fKE_in(0.), fXX_in(0.), fYY_in(0.), fZZ_in(0.), fTX_in(0.), fTY_in(0.), fTZ_in(0.), fKEout(0.), fXXout(0.), fYYout(0.), fZZout(0.), fTXout(0.), fTYout(0.), fTZout(0.)
+mmtEventAction::mmtEventAction(const mmtDetectorConstruction* detectorconstruction): G4UserEventAction(), fDet(detectorconstruction), fEvent(0), fInParticleID(0), fOutParticleID(0), fKE_in(0.), fXX_in(0.), fYY_in(0.), fZZ_in(0.), fTX_in(0.), fTY_in(0.), fTZ_in(0.), fKEout(0.), fXXout(0.), fYYout(0.), fZZout(0.), fTXout(0.), fTYout(0.), fTZout(0.)
 {
 }
 
@@ -73,7 +75,7 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 	G4int eventID = event->GetEventID();
 	
 	G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
-	 if (trajectoryContainer){
+	if (trajectoryContainer){
 	G4cout<<trajectoryContainer->entries()<<" trajectories in this event"<<G4endl;
 	int ntrj = 0;
 	//unsigned ntrj_total = trajectoryContainer->entries();
@@ -117,8 +119,25 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		G4double ty = momentum.y()/momentum.mag();
 		G4double tz = momentum.z()/momentum.mag();
 
-		if ((zz < -490.0 && abs(pid)== 13) | (zz < -490.0 && pid==2212))
+		//auto PDVol = fDet->GetG4VPhysicalVolume4ParticleDetector();
+		//EInside PointInPD=PDVol->Inside(FinalPosition);
+
+		G4double yCutOff = (fDet->ppsThickness/cm + fDet->airThickness/cm + fDet->ppsThickness/cm + fDet->PD_y/cm)/2 - (fDet->ppsThickness/cm + fDet->airThickness/cm + fDet->ppsThickness/cm);
+		G4cout<<"yCutOff "<<yCutOff<<G4endl;
+		/*
+		auto SolVol = fDet->GetG4VSolid4ParticleDetector();
+		EInside PointInPD=SolVol->Inside(FinalPosition);
+		if(PointInPD == kInside)
+		{	
+			G4cout<<"!!!BANG!!!"<<G4endl;
+		}
+		*/
+		
+		if (abs(pid)== 13 || abs(pid)==211 || abs(pid)==11 || pid==22 || pid==2212 || pid==2112)
 		{
+			if (yy < -400.0){
+				if (abs(xx)<125.0){
+					if (abs(zz)<500.0){
 			G4cout<<i<<"-th particle in event # "<<eventID<<" is "<<tj->GetPDGEncoding()<<", vtx point at "<<VertexPosition<<", last point at "<<FinalPosition<<", with direction ("<<tx<<", "<<ty<<", "<<tz<<")"<<G4endl;
 		
 		fEvent		= eventID;
@@ -127,9 +146,9 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		fXXout		= xx;
 		fYYout          = yy;
 		fZZout          = zz;
-		fTXout          = tx;
-		fTYout          = ty;
-		fTZout          = tz;
+		fTXout          = _x;
+		fTYout          = _y;
+		fTZout          = _z;
 
 		analysisManager->FillNtupleIColumn(1, 0, fEvent);
 		analysisManager->FillNtupleIColumn(1, 1, fOutParticleID);
@@ -141,9 +160,13 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		analysisManager->FillNtupleDColumn(1, 7, fTYout);
 		analysisManager->FillNtupleDColumn(1, 8, fTZout);
 		analysisManager->AddNtupleRow(1);
-
+		
 		ntrj += 1;
-		}
+		}//zz
+		}//xx
+		}//yy
+		}//mu
+		
 	}
-	 }
+	}
 }

@@ -139,13 +139,11 @@ void mmtMagneticField::GetFieldValue(const G4double* point,double *bField) const
 		G4cout<<"could not open pModule"<<endl;
 	}
 	*/
-	
-	bField[0] = 0.;
-	bField[1] = 0.;
-	bField[2] = 1.0*tesla;
-	
-	bField[3] = 0.0;
-	bField[4] = 0.0;
-	bField[5] = 0.0;
+        bField[0] = 0.;
+        bField[1] = 0.;
+        bField[2] = 0.75*tesla;
+        bField[3] = 0.0;
+        bField[4] = 0.0;
+        bField[5] = 0.0;
 	
 }

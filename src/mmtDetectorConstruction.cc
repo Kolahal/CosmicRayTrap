@@ -56,41 +56,44 @@ G4VPhysicalVolume* mmtDetectorConstruction::Construct()
 void mmtDetectorConstruction::DefineMaterials()
 {
 	// Lead material defined using NIST Manager
-	auto nistManager = G4NistManager::Instance();
+	//auto nistManager = G4NistManager::Instance();
 	
 	//G4Material* vac= new G4Material("Galactic", z=1., a=1.01*g/mole,density= universe_mean_density, kStateGas, 2.73*kelvin, 3.e-18*pascal);
-	G4Material* air=nistManager->FindOrBuildMaterial("G4_AIR");
-	G4Material* pps=nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+	//G4Material* air=nistManager->FindOrBuildMaterial("G4_AIR");
+	//G4Material* pps=nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
 	G4cout<<"Kolahal: MMTDetectorConstruction::DefineMaterials() -> "<< *(G4Material::GetMaterialTable()) << G4endl;
 }
 G4VPhysicalVolume* mmtDetectorConstruction::DefineVolumes()
 {
         // Geometry parameters
 	G4int nofLayers = 1;
-        G4double airThickness = 1000.0*cm;
-        G4double ppsThickness = 10.0*cm;
+        airThickness = 500.0*cm;
+        ppsThickness = 1.0000*cm;
         G4double calorSizeXY  = 1000.0*cm;
-        //G4double airThickness = 100.0*cm;
-        //G4double ppsThickness = 1.0*cm;
-        //G4double calorSizeXY  = 100.0*cm;
 	
         auto layerThickness = ppsThickness + airThickness + ppsThickness;
         auto calorThickness = nofLayers * layerThickness;
-        auto worldSizeXY = 1.05 * calorSizeXY;
-        auto worldSizeZ  = 1.05 * calorThickness;
+	auto PD_x = 2.5*m;
+	PD_y = 2.3*m;
+	auto PD_z = 10.*m;
 	
+	// introduce world spanning a large area
+	auto world_x = 100.0*m;
+	auto world_y = 1.05*(calorThickness + PD_y);
+	// world z extent just enough to contain the trap
+	auto world_z = 100.0*m;
+        
 	///////////////////////////////////////////////////////////////////////////
         // Get materials
-	
 	// Material definition
 	G4NistManager* nistManager = G4NistManager::Instance();
-
+	
 	// Air defined using NIST Manager
 	nistManager->FindOrBuildMaterial("G4_AIR");
-
+	
 	// Lead defined using NIST Manager
 	auto defaultMaterial = nistManager->FindOrBuildMaterial("G4_Galactic");
-	auto MagTrapMaterial = nistManager->FindOrBuildMaterial("G4_AIR");
+	auto MagTrapMaterial = nistManager->FindOrBuildMaterial("G4_AIR");//G4_CONCRETE
 	auto ScintlrMaterial = nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
 	/*
         //auto defaultMaterial = G4Material::GetMaterial("Galactic");
@@ -98,65 +101,38 @@ G4VPhysicalVolume* mmtDetectorConstruction::DefineVolumes()
 	auto MagTrapMaterial = G4Material::GetMaterial("G4_Fe");//G4_AIR
 	auto ScintlrMaterial = G4Material::GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
 	*///////////////////////////////////////////////////////////////////////////
-	G4RotationMatrix* Rot = new G4RotationMatrix;
-	Rot->rotateX(M_PI/2.*rad);//M_PI/2.*rad
-	/*
-	G4RotationMatrix* Rot = new G4RotationMatrix;
-	Rot->rotateX(M_PI/2.*rad);
+	//G4RotationMatrix* Rot = new G4RotationMatrix;
+	//Rot->rotateX(M_PI/2.*rad);//M_PI/2.*rad
 	
 	//World:
-	auto worldS = new G4Box("World", worldSizeXY/2, worldSizeXY/2, worldSizeZ/2);
-	auto worldLV= new G4LogicalVolume(worldS, defaultMaterial, "World");
-	auto worldPV= new G4PVPlacement(0, G4ThreeVector(), worldLV, "World", 0, false, 0, fCheckOverlaps);
-	
-	// Calorimeter
-	auto calorimeterS= new G4Box("Calorimeter",calorSizeXY/2, calorSizeXY/2, calorThickness/2);
-	auto calorLV	 = new G4LogicalVolume(calorimeterS, defaultMaterial,"Calorimeter");
-	auto calorPV	 = new G4PVPlacement(0, G4ThreeVector(), calorLV, "Calorimeter", worldLV, false, 0, fCheckOverlaps);
-	auto calorPV	 = new G4PVPlacement(Rot, G4ThreeVector(), calorLV, "Calorimeter", worldLV, false, 0, fCheckOverlaps);
-	
-	// Layer
-	auto layerS = new G4Box("Layer", calorSizeXY/2, calorSizeXY/2, layerThickness/2);
-	auto layerLV= new G4LogicalVolume(layerS, defaultMaterial, "Layer");
-	auto replica= new G4PVReplica("Layer", layerLV, calorLV, kZAxis, nofLayers, layerThickness);
-	
-	// Air
-	auto mmtAirS 	= new G4Box("mmtAir", calorSizeXY/2, calorSizeXY/2, airThickness/2);
-	auto mmtAirLV	= new G4LogicalVolume(mmtAirS, MagTrapMaterial, "mmtAir");
-	mmtAirPV	= new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), mmtAirLV, "mmtAir", layerLV, false, 0, fCheckOverlaps);
-	
-	// Scintillator - up
-	auto ppsPlate1S	= new G4Box("pps_up", calorSizeXY/2, calorSizeXY/2, ppsThickness/2);
-	auto ppsPlate1LV= new G4LogicalVolume(ppsPlate1S, ScintlrMaterial, "pps_up");
-	ppsPlate1PV	= new G4PVPlacement(0, G4ThreeVector(0.,0.,+(airThickness/2+ppsThickness/2)), ppsPlate1LV, "pps_up", layerLV, false, 0, fCheckOverlaps);
-	ppsPlate1PV	= new G4PVPlacement(0, G4ThreeVector(0., 0., (airThickness/2+ppsThickness/2)), ppsPlate1LV, "pps_up", layerLV, false, 0, fCheckOverlaps);
-	
-	// Scintillator - dn
-	auto ppsPlate2S = new G4Box("pps_dn", calorSizeXY/2, calorSizeXY/2, ppsThickness/2);
-	auto ppsPlate2LV= new G4LogicalVolume(ppsPlate2S, ScintlrMaterial, "pps_dn");
-	ppsPlate2PV     = new G4PVPlacement(0, G4ThreeVector(0.,0.,-(airThickness/2+ppsThickness/2)), ppsPlate2LV, "pps_dn", layerLV, false, 0, fCheckOverlaps);
-	*/
-	
-	//World:
-	auto worldS 	= new G4Box("World", worldSizeXY/2, worldSizeXY/2, worldSizeZ/2);
+	auto worldS 	= new G4Box("World", world_x/2, world_y/2, world_z/2);
 	auto worldLV	= new G4LogicalVolume(worldS, defaultMaterial, "World");
 	auto worldPV	= new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), worldLV, "World", 0, false, 0, fCheckOverlaps);
 	
-	// Air
-	auto mmtAirS	= new G4Box("mmtAir", calorSizeXY/2, calorSizeXY/2, airThickness/2);
-	auto mmtAirLV	= new G4LogicalVolume(mmtAirS, MagTrapMaterial, "mmtAir");
-	mmtAirPV	= new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), mmtAirLV, "mmtAir", worldLV, false, 0, fCheckOverlaps);
+	// Reference level
+	auto RefPlaneSV  = new G4Box("ReferenceLevel", world_x/2, 1.0*cm, world_z/2);
+	auto RefPlaneLV  = new G4LogicalVolume(RefPlaneSV, defaultMaterial, "RefLevel");
+	RefPlanePV	 = new G4PVPlacement(0, G4ThreeVector(0., +(airThickness/2+2.0*ppsThickness+PD_y/2), 0.), RefPlaneLV, "RefLevel", worldLV, false, 0, fCheckOverlaps);
+	
+	// Magnetic Trap
+	auto mmtAirS	= new G4Box("mmtAir", calorSizeXY/2, airThickness/2, calorSizeXY/2);
+	mmtAirLV	= new G4LogicalVolume(mmtAirS, MagTrapMaterial, "mmtAir");
+	mmtAirPV	= new G4PVPlacement(0, G4ThreeVector(0., 0.+PD_y/2, 0.), mmtAirLV, "mmtAir", worldLV, false, 0, fCheckOverlaps);
 	
 	// Scintillator - up
-	auto ppsPlate1S = new G4Box("pps_up", calorSizeXY/2, calorSizeXY/2, ppsThickness/2);
+	auto ppsPlate1S = new G4Box("pps_up", calorSizeXY/2, ppsThickness/2, calorSizeXY/2);
 	auto ppsPlate1LV= new G4LogicalVolume(ppsPlate1S, ScintlrMaterial, "pps_up");
-	ppsPlate1PV     = new G4PVPlacement(Rot, G4ThreeVector(0.,+(airThickness/2+ppsThickness/2), 0.), ppsPlate1LV, "pps_up", worldLV, false, 0, fCheckOverlaps);
+	ppsPlate1PV     = new G4PVPlacement(0, G4ThreeVector(0.,+(airThickness/2+ppsThickness/2+PD_y/2),0.), ppsPlate1LV, "pps_up", worldLV, false, 0, fCheckOverlaps);
 	
 	// Scintillator - dn
-	auto ppsPlate2S = new G4Box("pps_dn", calorSizeXY/2, calorSizeXY/2, ppsThickness/2);
+	auto ppsPlate2S = new G4Box("pps_dn", calorSizeXY/2, ppsThickness/2, calorSizeXY/2);
 	auto ppsPlate2LV= new G4LogicalVolume(ppsPlate2S, ScintlrMaterial, "pps_dn");
-	ppsPlate2PV     = new G4PVPlacement(Rot, G4ThreeVector(0.,-(airThickness/2+ppsThickness/2), 0.), ppsPlate2LV, "pps_dn", worldLV, false, 0, fCheckOverlaps);
-	//ppsPlate2PV     = new G4PVPlacement(0, G4ThreeVector(0., 0.,-(airThickness/2+ppsThickness/2)), ppsPlate2LV, "pps_dn", layerLV, false, 0, fCheckOverlaps);
+	ppsPlate2PV     = new G4PVPlacement(0, G4ThreeVector(0.,-(airThickness/2+ppsThickness/2)+PD_y/2,0.), ppsPlate2LV, "pps_dn", worldLV, false, 0, fCheckOverlaps);
+
+	// Particle Detector (PD)
+	PD_SV = new G4Box("ParticleDetector", PD_x/2, PD_y/2, PD_z/2);
+	auto PD_LV = new G4LogicalVolume(PD_SV, defaultMaterial, "ParticleDetector");
+	PD_PV = new G4PVPlacement(0, G4ThreeVector(0.,-(airThickness/2+ppsThickness/2),0.), PD_LV, "ParticleDetector", worldLV, false, 0, fCheckOverlaps);
 	
   	G4cout
     	<< G4endl
@@ -175,16 +151,25 @@ G4VPhysicalVolume* mmtDetectorConstruction::DefineVolumes()
     	<< "------------------------------------------------------------" << G4endl;
 	
 	// Visualization attributes
+	G4VisAttributes* worldVis = new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+	worldLV->SetVisAttributes(worldVis);
+
+	G4VisAttributes* RefPlaneVis = new G4VisAttributes(G4Colour(1.0,0.0,0.0));
+	//RefPlaneVis->SetForceAuxEdgeVisible(true);
+	RefPlaneLV->SetVisAttributes(RefPlaneVis);
 	
-	//worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
-	//auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,0.0));
-	//simpleBoxVisAtt->SetVisibility(true);
-	
-	//mmtAirLV->SetVisAttributes(simpleBoxVisAtt);
-	//auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-	//simpleBoxVisAtt->SetVisibility(true);
-	//calorLV->SetVisAttributes(simpleBoxVisAtt);
-	
+	G4VisAttributes* MagTrapVis = new G4VisAttributes(G4Colour(0.0,1.0,0.0));
+	mmtAirLV->SetVisAttributes(MagTrapVis);
+
+	G4VisAttributes* PPS_upVis = new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+	ppsPlate1LV->SetVisAttributes(PPS_upVis);
+
+	G4VisAttributes* PPS_dnVis = new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+	ppsPlate2LV->SetVisAttributes(PPS_dnVis);
+
+	G4VisAttributes* DetVis = new G4VisAttributes(G4Colour(0.7,0.4,.0));
+	PD_LV->SetVisAttributes(DetVis);
+
 	return worldPV;
 }
 void mmtDetectorConstruction::ConstructSDandField()
@@ -208,8 +193,12 @@ void mmtDetectorConstruction::ConstructSDandField()
 	*/
 	
 	mmtMagneticField* fField	= new mmtMagneticField();
-	G4FieldManager* fFieldMgr	= G4TransportationManager::GetTransportationManager()->GetFieldManager();
-	fFieldMgr->SetDetectorField(fField);
+	//G4FieldManager* fFieldMgr	= G4TransportationManager::GetTransportationManager()->GetFieldManager();
+	//fFieldMgr->SetDetectorField(fField);
+	G4FieldManager* fFieldMgr	= new G4FieldManager(fField);
+	G4bool alllocal = true;
+	mmtAirLV->SetFieldManager(fFieldMgr, alllocal);
+	
 	G4Mag_UsualEqRhs *fEquation = new G4Mag_UsualEqRhs(fField);
 	G4MagIntegratorStepper *fStepper = new G4ClassicalRK4(fEquation);
 	
@@ -222,6 +211,8 @@ void mmtDetectorConstruction::ConstructSDandField()
 	G4PropagatorInField* fieldPropagator = G4TransportationManager::GetTransportationManager()->GetPropagatorInField();
 	fieldPropagator->SetMinimumEpsilonStep(1.e-5*mm);//1.e-5
 	fieldPropagator->SetMaximumEpsilonStep(1.e-2*mm);//1.e-2
+	//G4bool alllocal = true;
+	//mmtAirLV->SetFieldManager(fFieldMgr, alllocal);
 	
 	/*
 	fIntgrDriver = new G4MagInt_Driver(0.000001*mm,fStepper,fStepper->GetNumberOfVariables() );
