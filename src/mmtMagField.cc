@@ -141,7 +141,7 @@ void mmtMagneticField::GetFieldValue(const G4double* point,double *bField) const
 	*/
         bField[0] = 0.;
         bField[1] = 0.;
-        bField[2] = 0.75*tesla;
+        bField[2] = 5.0*tesla;
         bField[3] = 0.0;
         bField[4] = 0.0;
         bField[5] = 0.0;

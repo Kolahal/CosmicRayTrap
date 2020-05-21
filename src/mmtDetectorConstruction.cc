@@ -67,7 +67,7 @@ G4VPhysicalVolume* mmtDetectorConstruction::DefineVolumes()
 {
         // Geometry parameters
 	G4int nofLayers = 1;
-        airThickness = 500.0*cm;
+        airThickness = 1000.0*cm;
         ppsThickness = 1.0000*cm;
         G4double calorSizeXY  = 1000.0*cm;
 	
@@ -92,8 +92,8 @@ G4VPhysicalVolume* mmtDetectorConstruction::DefineVolumes()
 	nistManager->FindOrBuildMaterial("G4_AIR");
 	
 	// Lead defined using NIST Manager
-	auto defaultMaterial = nistManager->FindOrBuildMaterial("G4_Galactic");
-	auto MagTrapMaterial = nistManager->FindOrBuildMaterial("G4_AIR");//G4_CONCRETE
+	auto defaultMaterial = nistManager->FindOrBuildMaterial("G4_Galactic");//G4_Galactic
+	auto MagTrapMaterial = nistManager->FindOrBuildMaterial("G4_AIR");//G4_CONCRETE//G4_AIR
 	auto ScintlrMaterial = nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
 	/*
         //auto defaultMaterial = G4Material::GetMaterial("Galactic");

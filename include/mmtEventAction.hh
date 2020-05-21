@@ -5,6 +5,7 @@
 #include "mmtRunAction.hh"
 #include "globals.hh"
 
+class mmtTrajectory;
 class mmtDetectorConstruction;
 
 class mmtEventAction : public G4UserEventAction
@@ -25,6 +26,7 @@ class mmtEventAction : public G4UserEventAction
 	G4int	 fEvent;
 
 	G4int	 fInParticleID;
+	G4double fITime;
 	G4double fKE_in;
 	G4double fXX_in;
 	G4double fYY_in;

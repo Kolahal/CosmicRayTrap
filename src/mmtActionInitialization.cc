@@ -4,6 +4,7 @@
 #include "mmtEventAction.hh"
 #include "mmtSteppingAction.hh"
 #include "mmtDetectorConstruction.hh"
+#include "mmtTrackingAction.hh"
 
 mmtActionInitialization::mmtActionInitialization(mmtDetectorConstruction* detConstruction): G4VUserActionInitialization(),fDetConstruction(detConstruction)
 {
@@ -25,4 +26,5 @@ void mmtActionInitialization::Build() const
 	auto eventAction = new mmtEventAction(fDetConstruction);
 	SetUserAction(eventAction);
 	SetUserAction(new mmtSteppingAction(fDetConstruction,eventAction));
+	SetUserAction(new mmtTrackingAction());
 }
