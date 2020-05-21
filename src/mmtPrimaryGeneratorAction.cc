@@ -182,7 +182,7 @@ void mmtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 			<< "pos (m)"
 			<< G4ThreeVector((*vect)[j]->y(), (*vect)[j]->z()+6.45, (*vect)[j]->x())
 			<< "time (s)"
-			<< (*vect)[j]->t()*s
+			<< (*vect)[j]->t()
 			<< " " << "direction cosines "
 			<< G4ThreeVector((*vect)[j]->v(), (*vect)[j]->w(), (*vect)[j]->u())
 			<< " " << endl;
@@ -222,7 +222,7 @@ void mmtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 		
 		fParticleGun->SetParticlePosition(G4ThreeVector((*vect)[j]->y()*m, (*vect)[j]->z()+6.45*m, (*vect)[j]->x()*m));
 		fParticleGun->SetParticleMomentumDirection(G4ThreeVector((*vect)[j]->v(), (*vect)[j]->w(), (*vect)[j]->u()));
-                fParticleGun->SetParticleTime((*vect)[j]->t()*s);
+                fParticleGun->SetParticleTime((*vect)[j]->t());
 		fParticleGun->GeneratePrimaryVertex(anEvent);
                 //delete (*vect)[j];
 		
@@ -232,10 +232,10 @@ void mmtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
         analysisManager->FillNtupleDColumn(0, 3, (*vect)[j]->y()*m);
         analysisManager->FillNtupleDColumn(0, 4, (*vect)[j]->z()+6.45*m);
         analysisManager->FillNtupleDColumn(0, 5, (*vect)[j]->x()*m);
-	analysisManager->FillNtupleDColumn(0, 5, (*vect)[j]->t()/s);
         analysisManager->FillNtupleDColumn(0, 6, (*vect)[j]->v());
         analysisManager->FillNtupleDColumn(0, 7, (*vect)[j]->w());
         analysisManager->FillNtupleDColumn(0, 8, (*vect)[j]->u());
+	analysisManager->FillNtupleDColumn(0, 9, (*vect)[j]->t());
         analysisManager->AddNtupleRow(0);
 
 	delete (*vect)[j];

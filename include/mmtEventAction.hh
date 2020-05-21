@@ -26,7 +26,6 @@ class mmtEventAction : public G4UserEventAction
 	G4int	 fEvent;
 
 	G4int	 fInParticleID;
-	G4double fITime;
 	G4double fKE_in;
 	G4double fXX_in;
 	G4double fYY_in;
@@ -34,7 +33,8 @@ class mmtEventAction : public G4UserEventAction
 	G4double fTX_in;
 	G4double fTY_in;
 	G4double fTZ_in;
-	
+	G4double f_T_in;
+
 	G4int fOutParticleID;
 	G4double fKEout;
 	G4double fXXout;
@@ -43,6 +43,7 @@ class mmtEventAction : public G4UserEventAction
 	G4double fTXout;
 	G4double fTYout;
 	G4double fTZout;
+	G4double f_Tout;
 
 	const mmtDetectorConstruction* fDet;
 };

@@ -27,7 +27,7 @@
 #include <typeinfo>
 using namespace std;
 
-mmtEventAction::mmtEventAction(const mmtDetectorConstruction* detectorconstruction): G4UserEventAction(), fDet(detectorconstruction), fEvent(0), fInParticleID(0), fITime(0.), fOutParticleID(0), fKE_in(0.), fXX_in(0.), fYY_in(0.), fZZ_in(0.), fTX_in(0.), fTY_in(0.), fTZ_in(0.), fKEout(0.), fXXout(0.), fYYout(0.), fZZout(0.), fTXout(0.), fTYout(0.), fTZout(0.)
+mmtEventAction::mmtEventAction(const mmtDetectorConstruction* detectorconstruction): G4UserEventAction(), fDet(detectorconstruction), fEvent(0), fInParticleID(0), fOutParticleID(0), fKE_in(0.), fXX_in(0.), fYY_in(0.), fZZ_in(0.), fTX_in(0.), fTY_in(0.), fTZ_in(0.), fKEout(0.), fXXout(0.), fYYout(0.), fZZout(0.), fTXout(0.), fTYout(0.), fTZout(0.), f_T_in(0.), f_Tout(0.)
 {
 }
 
@@ -42,7 +42,6 @@ void mmtEventAction::BeginOfEventAction(const G4Event* evt)
 	fEvent = 0;
 	fInParticleID = 0;
 	fOutParticleID= 0;
-	fITime = 0.0;
 	fKE_in = 0.0;
 	fXX_in = 0.0;
 	fYY_in = 0.0;
@@ -50,6 +49,7 @@ void mmtEventAction::BeginOfEventAction(const G4Event* evt)
 	fTX_in = 0.0;
 	fTY_in = 0.0;
 	fTZ_in = 0.0;
+	f_T_in = 0.0;
 	
 	fKEout = 0.0;
 	fXXout = 0.0;
@@ -58,7 +58,8 @@ void mmtEventAction::BeginOfEventAction(const G4Event* evt)
 	fTXout = 0.0;
 	fTXout = 0.0;
 	fTZout = 0.0;
-	
+	f_Tout = 0.0;
+
 	G4int evtNb = evt->GetEventID();
 	/*
 	G4AnalysisManager* analysisManager =   G4AnalysisManager::Instance();
@@ -84,6 +85,8 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 	G4AnalysisManager* analysisManager =   G4AnalysisManager::Instance();
 	G4int eventID = event->GetEventID();
 	
+	G4cout<<"->-> "<<eventID<<G4endl;
+
 	G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
 	if (trajectoryContainer){
 	G4cout<<trajectoryContainer->entries()<<" trajectories in this event"<<G4endl;
@@ -112,7 +115,7 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
                 }
 
                 //os << "Trajectory:";
-                G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
+                //G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
 		G4double finalTrackTime=0.0;
 		G4double finalTrackKE = 0.0;
 		G4ThreeVector finalTrackMomentum = G4ThreeVector(0.,0.,0.);
@@ -127,89 +130,13 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 				finalTrackKE = std::stod(iAttVal->GetValue());
 			else if (iAttVal->GetName() == "FTm")
 				finalTrackTime = std::stod(iAttVal->GetValue());
-                        G4cout<< iAttDef->second.GetDesc() << "    "<< iAttVal->GetName() <<"     "<<iAttVal->GetValue()<<G4endl;
+                        //G4cout<< iAttDef->second.GetDesc() << "    "<< iAttVal->GetName() <<"     "<<iAttVal->GetValue()<<G4endl;
                 }
                 delete attValues;
-                G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
-		G4cout<<"final Mom " <<finalTrackMomentum/GeV<<",   final KE" <<finalTrackKE<<",   final time "<< finalTrackTime << G4endl;
+                //G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
+		G4cout<<"final Mom " <<finalTrackMomentum<<",   final KE " <<finalTrackKE<<",   final time "<< finalTrackTime << G4endl;
 
-		//G4cout<<"final KE "<<trj->GetFinalKE()/GeV<<G4endl;
-		//G4cout<<"final dirn "<<trj->GetFinalDirection()<<G4endl;
-		//G4cout<<"final time "<<trj->GetFinalTime()<<G4endl;
-		
-		//delete trj;
-		/*
-		for(int n = 0; n<trj->GetPointEntries(); n++)
-		{
-			mmtTrajectoryPoint* mmtp = new mmtTrajectoryPoint();
-
-			G4VTrajectoryPoint* aPoint= trj->GetPoint(n);
-			G4cout<<"mom["<<n<<"]:"<<((mmtTrajectoryPoint*)aPoint)->findMomentum()<<", time "<<((mmtTrajectoryPoint*)aPoint)->GetTime()/s<<", position "<<aPoint->GetPosition()/m<<G4endl;
-
-			delete mmtp;
-		}
-		*/
-		/*
-		if (abs(tj->GetPDGEncoding())==13)
-		{
-			unsigned npoints = 0;
-			npoints = tj->GetPointEntries();
-			for (unsigned n=0; n<npoints; n++)
-			{
-				G4VTrajectoryPoint* aPoint= tj->GetPoint(n);
-				G4ThreeVector aPosition = aPoint->GetPosition();
-				//G4cout<<":- "<<aPosition<<G4endl;
-			}
-			//G4cout<<"--------------"<<G4endl;
-		}
-		*/
 		G4VTrajectoryPoint* StartingPoint= trj->GetPoint(0);
-		//G4VTrajectoryPoint* StartingPoint= trj->GetPoint(0);
-
-		//mmtTrajectoryPoint* q = (mmtTrajectoryPoint*)(StartingPoint);
-		//mmtTrajectoryPoint* testPoint = new mmtTrajectoryPoint(*q);
-		//mmtTrajectoryPoint* testPoint = new mmtTrajectoryPoint();
-		//*testPoint = *q;
-		//fITime = testPoint->GetTime();
-		//G4ThreeVector testMom = testPoint->GetMomentum();
-		//G4cout<<"VertexTime "<< fITime <<", mom "<<testMom/GeV<<G4endl;
-		
-		//const std::map< G4String,G4AttDef > *mp = StartingPoint->GetAttDefs();
-		//G4cout<<(*mp)["Time"]<<G4endl;
-
-		//auto x = ->GetInstance("TrajectoryPoint", true);
-		//G4cout<<"--> "<< typeid((*mp)["Time"]).name() <<G4endl;
-		//
-		
-		//mmtTrajectoryPoint* mmtp = new mmtTrajectoryPoint();
-		
-		//G4double tt0		= mmtp->findTime( (mmtTrajectoryPoint*)StartingPoint );
-		//G4ThreeVector mom0	= mmtp->findMomentum( (mmtTrajectoryPoint*)StartingPoint );
-		//G4cout<<"time "<<tt0/s<<",      mom "<<mom0/GeV<<G4endl;
-		
-		//delete mmtp;
-		/*
-		std::vector<G4AttValue>* attValues = ((mmtTrajectoryPoint*)StartingPoint)->CreateAttValues();
-		const std::map<G4String,G4AttDef>* attDefs = ((mmtTrajectoryPoint*)StartingPoint)->GetAttDefs();
-		
-		//if (G4AttCheck(attValues,attDefs).Check("Time"))
-		//{
-		//	G4cout<<"yes"<<G4endl;
-		//	return;
-		//}
-
-		//os << "Trajectory:";
-		G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
-		std::vector<G4AttValue>::iterator iAttVal;
-		for (iAttVal = attValues->begin(); iAttVal != attValues->end(); ++iAttVal)
-		{
-			//G4cout<< iAttVal->GetName() << G4endl;
-			std::map<G4String,G4AttDef>::const_iterator iAttDef = attDefs->find(iAttVal->GetName());
-			G4cout<< iAttDef->second.GetDesc() << "    "<< iAttVal->GetName() <<"     "<<iAttVal->GetValue()<<G4endl;
-		}
-		delete attValues;
-		G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
-		*/
 		G4ThreeVector VertexPosition = StartingPoint->GetPosition();
 		
 		G4VTrajectoryPoint* LastPoint = trj->GetPoint(trj->GetPointEntries()-1);
@@ -222,16 +149,16 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		G4ParticleDefinition* p = particleTable->FindParticle(pid);
 		G4double mass = p->GetPDGMass();
 		
-		G4double _x = VertexPosition.x()/cm;
-		G4double _y = VertexPosition.y()/cm;
-		G4double _z = VertexPosition.z()/cm;
+		//G4double _x = VertexPosition.x()/cm;
+		//G4double _y = VertexPosition.y()/cm;
+		//G4double _z = VertexPosition.z()/cm;
 		G4double xx = FinalPosition.x()/cm;
 		G4double yy = FinalPosition.y()/cm;
 		G4double zz = FinalPosition.z()/cm;
-		G4double ke = sqrt(momentum*momentum + mass*mass) - mass;//since initial momentum was used, what we have here is initialKE
-		G4double tx = momentum.x()/momentum.mag();
-		G4double ty = momentum.y()/momentum.mag();
-		G4double tz = momentum.z()/momentum.mag();
+		//G4double ke = sqrt(momentum*momentum + mass*mass) - mass;//since initial momentum was used, what we have here is initialKE
+		G4double tx = finalTrackMomentum.x()/finalTrackMomentum.mag();
+		G4double ty = finalTrackMomentum.y()/finalTrackMomentum.mag();
+		G4double tz = finalTrackMomentum.z()/finalTrackMomentum.mag();
 		
 		//auto PDVol = fDet->GetG4VPhysicalVolume4ParticleDetector();
 		//EInside PointInPD=PDVol->Inside(FinalPosition);
@@ -247,7 +174,7 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 			G4cout<<"!!!BANG!!!"<<G4endl;
 		}
 		*/
-		
+
 		if (abs(pid)== 13 || abs(pid)==211 || abs(pid)==11 || pid==22 || pid==2212 || pid==2112)
 		{
 			if (yy < yCutOff){
@@ -257,13 +184,14 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		
 		fEvent		= eventID;
 		fOutParticleID	= pid;
-		fKEout		= ke/GeV;
+		fKEout		= finalTrackKE;
 		fXXout		= xx;
 		fYYout          = yy;
 		fZZout          = zz;
-		fTXout          = _x;
-		fTYout          = _y;
-		fTZout          = _z;
+		fTXout          = tx;
+		fTYout          = ty;
+		fTZout          = tz;
+		f_Tout		= finalTrackTime;
 
 		analysisManager->FillNtupleIColumn(1, 0, fEvent);
 		analysisManager->FillNtupleIColumn(1, 1, fOutParticleID);
@@ -274,13 +202,14 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		analysisManager->FillNtupleDColumn(1, 6, fTXout);
 		analysisManager->FillNtupleDColumn(1, 7, fTYout);
 		analysisManager->FillNtupleDColumn(1, 8, fTZout);
+		analysisManager->FillNtupleDColumn(1, 9, f_Tout);
 		analysisManager->AddNtupleRow(1);
 		
 		ntrj += 1;
 		}//zz
 		}//xx
 		}//yy
-		}//mu
+		}//all standard particles: mu, e, pi, p, n
 		
 	}
 	}

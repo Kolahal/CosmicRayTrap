@@ -30,7 +30,7 @@ mmtTrajectoryPoint::mmtTrajectoryPoint()
 mmtTrajectoryPoint::mmtTrajectoryPoint(const G4Step* aStep)
 	: G4TrajectoryPoint(aStep->GetPostStepPoint()->GetPosition()), fpAuxiliaryPointVector(aStep->GetPointerToVectorOfAuxiliaryPoints())
 {
-	G4cout<<"mmtTrajectoryPoint Constructor 2"<<G4endl;
+	//G4cout<<"mmtTrajectoryPoint Constructor 2"<<G4endl;
 	fTime = aStep->GetPostStepPoint()->GetGlobalTime();
 	fMomentum = aStep->GetPostStepPoint()->GetMomentum();
 	fStepStatus = aStep->GetPostStepPoint()->GetStepStatus();
@@ -48,7 +48,7 @@ mmtTrajectoryPoint::mmtTrajectoryPoint(const G4Step* aStep)
 mmtTrajectoryPoint::mmtTrajectoryPoint(const G4Track* aTrack)
 	: G4TrajectoryPoint(aTrack->GetPosition()), fpAuxiliaryPointVector(0)
 {
-	G4cout<<"mmtTrajectoryPoint Constructor 3"<<G4endl;
+	//G4cout<<"mmtTrajectoryPoint Constructor 3"<<G4endl;
 	fTime = aTrack->GetGlobalTime();
 	fMomentum = aTrack->GetMomentum();
 	fStepStatus = fUndefined;
@@ -59,7 +59,7 @@ mmtTrajectoryPoint::mmtTrajectoryPoint(const G4Track* aTrack)
 
 mmtTrajectoryPoint::mmtTrajectoryPoint(mmtTrajectoryPoint &right): G4TrajectoryPoint(right), fpAuxiliaryPointVector(right.fpAuxiliaryPointVector)
 {
-	G4cout<<"mmtTrajectoryPoint Constructor 4"<<G4endl;
+	//G4cout<<"mmtTrajectoryPoint Constructor 4"<<G4endl;
 	
 	fTime		= right.fTime;
 	fMomentum	= right.fMomentum;

@@ -38,7 +38,7 @@ mmtTrajectory::mmtTrajectory()
 
 mmtTrajectory::mmtTrajectory(const G4Track* aTrack)
 {
-	G4cout<< "mmtTrajectory Constructor 2" <<G4endl;
+	//G4cout<< "mmtTrajectory Constructor 2" <<G4endl;
 	G4ParticleDefinition * particleDefinition = aTrack->GetDefinition();
 	fParticleName = particleDefinition->GetParticleName();
 	fPDGCharge = particleDefinition->GetPDGCharge();
@@ -67,7 +67,7 @@ mmtTrajectory::mmtTrajectory(const G4Track* aTrack)
 
 mmtTrajectory::mmtTrajectory(mmtTrajectory & right) : G4VTrajectory(right)
 {
-	G4cout<< "mmtTrajectory Constructor 3" <<G4endl;
+	//G4cout<< "mmtTrajectory Constructor 3" <<G4endl;
 	fParticleName = right.fParticleName;
 	fPDGCharge = right.fPDGCharge;
 	fPDGEncoding = right.fPDGEncoding;
@@ -115,7 +115,7 @@ void mmtTrajectory::ShowTrajectory(std::ostream& os) const
 
 void mmtTrajectory::AppendStep(const G4Step* aStep)
 {
-	G4cout<< "mmtTrajectory::AppendStep" <<G4endl;
+	//G4cout<< "mmtTrajectory::AppendStep" <<G4endl;
 	fpPointsContainer->push_back(new mmtTrajectoryPoint(aStep));
 
 	// Except for first step, which is a sort of virtual step to start

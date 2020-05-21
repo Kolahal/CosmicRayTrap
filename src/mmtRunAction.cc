@@ -22,11 +22,11 @@ mmtRunAction::mmtRunAction(): G4UserRunAction(), outputFile(0), outputTree(0)
 	analysisManager->CreateNtupleDColumn("ke_in");
 	analysisManager->CreateNtupleDColumn("xx_in");
 	analysisManager->CreateNtupleDColumn("yy_in");
-	analysisManager->CreateNtupleDColumn("tm_in");
 	analysisManager->CreateNtupleDColumn("zz_in");
 	analysisManager->CreateNtupleDColumn("tx_in");
 	analysisManager->CreateNtupleDColumn("ty_in");
 	analysisManager->CreateNtupleDColumn("tz_in");
+	analysisManager->CreateNtupleDColumn("tm_in");
 	analysisManager->FinishNtuple();
 
 	analysisManager->CreateNtuple("CosmicMuOutTuple", "ComicMuOutfo");
@@ -39,6 +39,7 @@ mmtRunAction::mmtRunAction(): G4UserRunAction(), outputFile(0), outputTree(0)
 	analysisManager->CreateNtupleDColumn("txEnd");
 	analysisManager->CreateNtupleDColumn("tyEnd");
 	analysisManager->CreateNtupleDColumn("tzEnd");
+	analysisManager->CreateNtupleDColumn("tmEnd");
 	analysisManager->FinishNtuple();
 }
 mmtRunAction::~mmtRunAction()
