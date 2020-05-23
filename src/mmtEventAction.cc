@@ -80,12 +80,12 @@ void mmtEventAction::BeginOfEventAction(const G4Event* evt)
 
 void mmtEventAction::EndOfEventAction(const G4Event* event)
 {
-	std::cout<<"EndOfEventAction"<<std::endl;
+	std::cout<<"EndOfEventAction: event#"<<event->GetEventID()<<std::endl;
 
 	G4AnalysisManager* analysisManager =   G4AnalysisManager::Instance();
 	G4int eventID = event->GetEventID();
 	
-	G4cout<<"->-> "<<eventID<<G4endl;
+	//G4cout<<"->-> "<<eventID<<G4endl;
 
 	G4TrajectoryContainer* trajectoryContainer = event->GetTrajectoryContainer();
 	if (trajectoryContainer){
@@ -134,14 +134,14 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
                 }
                 delete attValues;
                 //G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
-		G4cout<<"final Mom " <<finalTrackMomentum<<",   final KE " <<finalTrackKE<<",   final time "<< finalTrackTime << G4endl;
+		//G4cout<<"final Mom " <<finalTrackMomentum<<",   final KE " <<finalTrackKE<<",   final time "<< finalTrackTime << G4endl;
 
 		G4VTrajectoryPoint* StartingPoint= trj->GetPoint(0);
 		G4ThreeVector VertexPosition = StartingPoint->GetPosition();
 		
-		G4VTrajectoryPoint* LastPoint = trj->GetPoint(trj->GetPointEntries()-1);
+		G4VTrajectoryPoint* LastPoint = trj->GetPoint(trj->GetPointEntries()-2);
 		G4ThreeVector FinalPosition = LastPoint->GetPosition();
-		
+		//G4cout<<"--> "<< FinalPosition <<G4endl;
 		G4ThreeVector momentum = trj->GetInitialMomentum();
 		G4int   pid = trj->GetPDGEncoding();
 		
@@ -149,13 +149,9 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		G4ParticleDefinition* p = particleTable->FindParticle(pid);
 		G4double mass = p->GetPDGMass();
 		
-		//G4double _x = VertexPosition.x()/cm;
-		//G4double _y = VertexPosition.y()/cm;
-		//G4double _z = VertexPosition.z()/cm;
 		G4double xx = FinalPosition.x()/cm;
 		G4double yy = FinalPosition.y()/cm;
 		G4double zz = FinalPosition.z()/cm;
-		//G4double ke = sqrt(momentum*momentum + mass*mass) - mass;//since initial momentum was used, what we have here is initialKE
 		G4double tx = finalTrackMomentum.x()/finalTrackMomentum.mag();
 		G4double ty = finalTrackMomentum.y()/finalTrackMomentum.mag();
 		G4double tz = finalTrackMomentum.z()/finalTrackMomentum.mag();
@@ -164,8 +160,8 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		//EInside PointInPD=PDVol->Inside(FinalPosition);
 		
 		G4double yCutOff = (fDet->ppsThickness/cm + fDet->airThickness/cm + fDet->ppsThickness/cm + fDet->PD_y/cm)/2 - (fDet->ppsThickness/cm + fDet->airThickness/cm + fDet->ppsThickness/cm);
-		G4cout<<"yCutOff "<<yCutOff<<G4endl;
-		G4cout<<"--------------"<<G4endl;
+		//G4cout<<"yCutOff "<<yCutOff<<"      "<<trj->GetTrackID()<<"    "<<trj->GetState()<<G4endl;
+		//G4cout<<"--------------"<<G4endl;
 		/*
 		auto SolVol = fDet->GetG4VSolid4ParticleDetector();
 		EInside PointInPD=SolVol->Inside(FinalPosition);
@@ -174,7 +170,37 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 			G4cout<<"!!!BANG!!!"<<G4endl;
 		}
 		*/
+		
+		if (trj->GetState() == 1)//the G4Track for the trajectory stopped since it entered the fTargetVolume
+		{
+			G4cout<<i<<"-th particle in event # "<<eventID<<" is "<<trj->GetPDGEncoding()<<", vtx point at "<<VertexPosition<<", last point at "<<FinalPosition<<", with direction ("<<tx<<", "<<ty<<", "<<tz<<")"<<G4endl;
+	                fEvent          = eventID;
+	                fOutParticleID  = pid;
+        	        fKEout          = finalTrackKE;
+                	fXXout          = xx;
+	                fYYout          = yy;
+        	        fZZout          = zz;
+                	fTXout          = tx;
+	                fTYout          = ty;
+        	        fTZout          = tz;
+        	        f_Tout          = finalTrackTime;
 
+	                analysisManager->FillNtupleIColumn(1, 0, fEvent);
+        	        analysisManager->FillNtupleIColumn(1, 1, fOutParticleID);
+                	analysisManager->FillNtupleDColumn(1, 2, fKEout);
+	                analysisManager->FillNtupleDColumn(1, 3, fXXout);
+        	        analysisManager->FillNtupleDColumn(1, 4, fYYout);
+                	analysisManager->FillNtupleDColumn(1, 5, fZZout);
+	                analysisManager->FillNtupleDColumn(1, 6, fTXout);
+        	        analysisManager->FillNtupleDColumn(1, 7, fTYout);
+                	analysisManager->FillNtupleDColumn(1, 8, fTZout);
+	                analysisManager->FillNtupleDColumn(1, 9, f_Tout);
+        	        analysisManager->AddNtupleRow(1);
+                
+                	ntrj += 1;
+		}
+
+		/*
 		if (abs(pid)== 13 || abs(pid)==211 || abs(pid)==11 || pid==22 || pid==2212 || pid==2112)
 		{
 			if (yy < yCutOff){
@@ -210,7 +236,7 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		}//xx
 		}//yy
 		}//all standard particles: mu, e, pi, p, n
-		
+		*/
 	}
 	}
 }

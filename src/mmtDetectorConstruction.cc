@@ -67,15 +67,15 @@ G4VPhysicalVolume* mmtDetectorConstruction::DefineVolumes()
 {
         // Geometry parameters
 	G4int nofLayers = 1;
-        airThickness = 1000.0*cm;
+        airThickness = 750.0*cm;
         ppsThickness = 1.0000*cm;
         G4double calorSizeXY  = 1000.0*cm;
 	
         auto layerThickness = ppsThickness + airThickness + ppsThickness;
         auto calorThickness = nofLayers * layerThickness;
-	auto PD_x = 2.5*m;
-	PD_y = 2.3*m;
-	auto PD_z = 10.*m;
+	auto PD_x = 5.0*m;
+	PD_y = 2.5*m;
+	auto PD_z = 5.0*m;
 	
 	// introduce world spanning a large area
 	auto world_x = 100.0*m;

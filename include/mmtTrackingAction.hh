@@ -5,6 +5,7 @@
 #include "G4UserTrackingAction.hh"
 
 //class mmtTrackingActionMessenger;
+class G4LogicalVolume;
 
 class mmtTrackingAction : public G4UserTrackingAction
 {
@@ -14,6 +15,9 @@ class mmtTrackingAction : public G4UserTrackingAction
 
 		virtual void PreUserTrackingAction(const G4Track*);
 		virtual void PostUserTrackingAction(const G4Track*);
+
+	private:
+		//G4LogicalVolume* fTargetVolume;
 		/*
 		inline void		SetOutTrackId(G4int val){iOutTrackId=val;strOutParticle="all";}; 
 		inline G4int	GetOutTrackId(){return iOutTrackId;}; 

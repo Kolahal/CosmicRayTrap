@@ -16,7 +16,7 @@
 #include "G4TrajectoryPoint.hh"
 
 //#include "mmtDetectorConstruction.hh"
-//class G4LogicalVolume;
+class G4LogicalVolume;
 
 typedef std::vector<G4VTrajectoryPoint*> TrajectoryPointContainer;
 
@@ -55,6 +55,7 @@ class mmtTrajectory : public G4VTrajectory
      inline G4ThreeVector GetFinalMomentum() const {return fFinalMomentum;}
      inline G4ThreeVector GetFinalDirection() const {return fFinalDirection;}
      inline G4double GetFinalTime() const {return fFinalTime;}
+     inline G4int GetState() const {return fState;}
 
 // Other member functions
 
@@ -93,8 +94,9 @@ class mmtTrajectory : public G4VTrajectory
      G4ThreeVector fFinalMomentum;
      G4ThreeVector fFinalDirection;
      G4double      fFinalTime;
+     G4double	   fState;
 
-     //G4LogicalVolume* fTargetVolume;
+     G4LogicalVolume* fTargetVolume;
 };
 
 extern G4ThreadLocal G4Allocator<mmtTrajectory>* mmtTrajectoryAllocator;

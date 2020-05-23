@@ -30,8 +30,9 @@ mmtTrajectory::mmtTrajectory()
 	fFinalKineticEnergy(0.),
 	fFinalMomentum(G4ThreeVector(0.,0.,0.)),
 	//fFinalDirection(G4ThreeVector(0.,0.,0.)),
-	fFinalTime(0.)
-	
+	fFinalTime(0.),
+	fTargetVolume(0),
+	fState(-999)
 	{G4cout<< "mmtTrajectory Constructor 1" <<G4endl;}
 
 	//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -52,11 +53,13 @@ mmtTrajectory::mmtTrajectory(const G4Track* aTrack)
         fFinalMomentum = aTrack->GetMomentum();
         //fFinalDirection= aTrack->GetMomentumDirection();
         fFinalTime = aTrack->GetGlobalTime();
+	
+	fState=-999;
 
 	fpPointsContainer = new TrajectoryPointContainer();
 	// Following is for the first trajectory point
 	fpPointsContainer->push_back(new mmtTrajectoryPoint(aTrack));
-
+	
 	//fFinalKineticEnergy = aTrack->GetKineticEnergy();
 	//fFinalMomentum = aTrack->GetMomentum();
 	//fFinalDirection= aTrack->GetMomentumDirection();
@@ -81,6 +84,8 @@ mmtTrajectory::mmtTrajectory(mmtTrajectory & right) : G4VTrajectory(right)
 	//fFinalDirection= right.fFinalDirection;
 	fFinalTime = right.fFinalTime;
 	
+	fState = -999;
+
 	fpPointsContainer = new TrajectoryPointContainer();
 
 	for(size_t i=0;i<right.fpPointsContainer->size();++i) {
@@ -122,18 +127,28 @@ void mmtTrajectory::AppendStep(const G4Step* aStep)
 	// the track, compute the final values...
 	const G4Track* track = aStep->GetTrack();
 	
+	fTargetVolume = G4LogicalVolumeStore::GetInstance()->GetVolume("ParticleDetector");
 	/*
-	//fTargetVolume = G4LogicalVolumeStore::GetInstance()->GetVolume("ParticleDetector");
-	
-	//G4LogicalVolume* theVolume = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume();
-	
-	//if (theVolume == fTargetVolume)
-	//{
-	//	track->SetTrackStatus(fStopAndKill);
-	//	G4cout<<"BANG BANG"<<G4endl;
-	//	return;
-	//}
+	if (fTargetVolume){
+                G4cout<<" mmtTrajectory::AppendStep:- fTargetVolume "<<fTargetVolume->GetName()<<G4endl;
+	}
 	*/
+	G4LogicalVolume* theVolume1 = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume();
+	
+	G4LogicalVolume* theVolume2= track->GetVolume()->GetLogicalVolume();
+        
+	//if (theVolume1)
+	//	G4cout<<" mmtTrajectory::AppendStep:- theVolume1 "<<theVolume1->GetName()<<G4endl;
+	//if (theVolume2)
+	//	G4cout<<" mmtTrajectory::AppendStep:- theVolume2 "<<theVolume2->GetName()<<G4endl;
+	
+	if ( (fTargetVolume->GetName() == theVolume1->GetName()) | (fTargetVolume->GetName() == theVolume2->GetName()) )
+	{
+		G4cout<<"BANG BANG" << aStep->GetPreStepPoint()->GetPosition() <<"     tk id "<<track->GetTrackID()<<G4endl;
+		fState = 1;
+		( (G4Track*)track )->SetTrackStatus(fStopAndKill);//fStopAndKill//fKillTrackAndSecondaries
+		return;
+	}
 	
 	if (track->GetCurrentStepNumber() > 0)
 	{

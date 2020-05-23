@@ -5,15 +5,34 @@
 #include "G4TrackingManager.hh"
 #include "G4Track.hh"
 
+#include "G4LogicalVolumeStore.hh"
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...... 
 mmtTrackingAction::mmtTrackingAction()
-	:G4UserTrackingAction()
+	:G4UserTrackingAction() //fTargetVolume(NULL)
 {;}
 
 void mmtTrackingAction::PreUserTrackingAction(const G4Track* aTrack)
 {
 	fpTrackingManager->SetStoreTrajectory(true);
 	fpTrackingManager->SetTrajectory(new mmtTrajectory(aTrack));
+	/*
+	fTargetVolume = G4LogicalVolumeStore::GetInstance()->GetVolume("ParticleDetector");
+	auto CurrentTrackStepVolume = aTrack->GetLogicalVolumeAtVertex();
+	if (fTargetVolume)
+		G4cout<<" mmtTrackingAction::PreUserTrackingAction:- fTargetVolume "<<G4endl;
+	//if (CurrentTrackStepVolume)
+	//	G4cout<<" mmtTrackingAction::PreUserTrackingAction:- CurrentTrackStepVolume "<<G4endl;
+
+	if (fTargetVolume == CurrentTrackStepVolume)
+	{
+		//aTrack->SetTrackStatus(fStopAndKill);
+		( (G4Track*) aTrack )->SetTrackStatus( fStopAndKill );
+		G4cout<<"BANG BANG!!!"<<G4endl;
+		return;
+	}
+	*/
+	
 	/*
 	// Create trajectory only for track in tracking region
 	mmtTrackInformation* trackInfo = 
