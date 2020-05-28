@@ -135,14 +135,14 @@ void mmtTrajectory::AppendStep(const G4Step* aStep)
 	*/
 	G4LogicalVolume* theVolume1 = aStep->GetPreStepPoint()->GetPhysicalVolume()->GetLogicalVolume();
 	
-	G4LogicalVolume* theVolume2= track->GetVolume()->GetLogicalVolume();
+	//G4LogicalVolume* theVolume2= track->GetVolume()->GetLogicalVolume();
         
 	//if (theVolume1)
 	//	G4cout<<" mmtTrajectory::AppendStep:- theVolume1 "<<theVolume1->GetName()<<G4endl;
 	//if (theVolume2)
 	//	G4cout<<" mmtTrajectory::AppendStep:- theVolume2 "<<theVolume2->GetName()<<G4endl;
 	
-	if ( (fTargetVolume->GetName() == theVolume1->GetName()) | (fTargetVolume->GetName() == theVolume2->GetName()) )
+	if ( (fTargetVolume->GetName() == theVolume1->GetName()) )
 	{
 		G4cout<<"BANG BANG" << aStep->GetPreStepPoint()->GetPosition() <<"     tk id "<<track->GetTrackID()<<G4endl;
 		fState = 1;

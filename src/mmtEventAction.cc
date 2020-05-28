@@ -127,14 +127,15 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 			if (iAttVal->GetName() == "FMom")
 				finalTrackMomentum = G4UIcmdWith3VectorAndUnit::GetNew3VectorValue( iAttVal->GetValue() );
 			if (iAttVal->GetName() == "FKE")
-				finalTrackKE = std::stod(iAttVal->GetValue());
+				finalTrackKE = std::stod( iAttVal->GetValue() );
 			else if (iAttVal->GetName() == "FTm")
 				finalTrackTime = std::stod(iAttVal->GetValue());
                         //G4cout<< iAttDef->second.GetDesc() << "    "<< iAttVal->GetName() <<"     "<<iAttVal->GetValue()<<G4endl;
                 }
                 delete attValues;
+
                 //G4cout<< "+++++++++++++++++++++++++++++++++++++++++++++++++" <<G4endl;
-		//G4cout<<"final Mom " <<finalTrackMomentum<<",   final KE " <<finalTrackKE<<",   final time "<< finalTrackTime << G4endl;
+		G4cout<<"final Mom " <<G4BestUnit(finalTrackMomentum, "Energy")<<",   final KE " <<finalTrackKE<<",   final time "<< G4BestUnit(finalTrackTime, "Time")<< G4endl;
 
 		G4VTrajectoryPoint* StartingPoint= trj->GetPoint(0);
 		G4ThreeVector VertexPosition = StartingPoint->GetPosition();
@@ -142,12 +143,14 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		G4VTrajectoryPoint* LastPoint = trj->GetPoint(trj->GetPointEntries()-2);
 		G4ThreeVector FinalPosition = LastPoint->GetPosition();
 		//G4cout<<"--> "<< FinalPosition <<G4endl;
-		G4ThreeVector momentum = trj->GetInitialMomentum();
+		//G4ThreeVector momentum = trj->GetInitialMomentum();
 		G4int   pid = trj->GetPDGEncoding();
 		
 		G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 		G4ParticleDefinition* p = particleTable->FindParticle(pid);
 		G4double mass = p->GetPDGMass();
+
+		G4cout<< "mass:-" << mass <<G4endl;
 		
 		G4double xx = FinalPosition.x()/cm;
 		G4double yy = FinalPosition.y()/cm;
@@ -155,6 +158,8 @@ void mmtEventAction::EndOfEventAction(const G4Event* event)
 		G4double tx = finalTrackMomentum.x()/finalTrackMomentum.mag();
 		G4double ty = finalTrackMomentum.y()/finalTrackMomentum.mag();
 		G4double tz = finalTrackMomentum.z()/finalTrackMomentum.mag();
+		G4cout<< "momentum:-" << finalTrackMomentum.mag() <<G4endl;
+		finalTrackKE= 1.e-3*(sqrt( finalTrackMomentum.mag()*finalTrackMomentum.mag() + mass*mass) - mass);
 		
 		//auto PDVol = fDet->GetG4VPhysicalVolume4ParticleDetector();
 		//EInside PointInPD=PDVol->Inside(FinalPosition);
